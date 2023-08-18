@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    .quizContainer {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quizContainer">
+    <h2 class="mb-4">Quiz App</h2>
+    <div id="question" class="mb-4"></div>
+    <div id="options" class="mb-4"></div>
+    <button id="next" class="btn btn-primary">Next</button>
+    <div id="result" class="mt-4"></div>
+  </div>
+
+  <script>
+    const quizContainer = document.querySelector('.quizContainer');
+    const questionElement = document.getElementById('question');
+    const optionsElement = document.getElementById('options');
+    const nextButton = document.getElementById('next');
+    const resultElement = document.getElementById('result');
+
+    const questions = [
+      {
+        question: 'What is the capital of France?',
+        options: ['Paris', 'Berlin', 'London', 'Madrid'],
+        correctAnswer: 'Paris'
+      },
+      {
+        question: 'Which planet is known as the Red Planet?',
+        options: ['Mars', 'Jupiter', 'Venus', 'Saturn'],
+        correctAnswer: 'Mars'
+      },
+      // Add more questions...
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function displayQuestion() {
+      const question = questions[currentQuestion];
+      questionElement.textContent = question.question;
+
+      optionsElement.innerHTML = '';
+      question.options.forEach((option, index) => {
+        const label = document.createElement('label');
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'options';
+        radio.value = index;
+        radio.classList.add('mx-2');
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(option));
+        optionsElement.appendChild(label);
+      });
+
+      nextButton.disabled = true; // Disable next button initially
+    }
+
+    async function proceedNext() {
+      const selectedOption = document.querySelector('input[name="options"]:checked');
+      if (selectedOption) {
+        const selectedAnswerIndex = parseInt(selectedOption.value);
+        const question = questions[currentQuestion];
+        if (question.options[selectedAnswerIndex] === question.correctAnswer) {
+          score++;
+        }
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          displayQuestion();
+          nextButton.disabled = true;
+        } else {
+          await showResult();
+        }
+      }
+    }
+
+    async function showResult() {
+      quizContainer.innerHTML = '';
+      const resultMessage = document.createElement('p');
+      resultMessage.textContent = `You scored ${score} out of ${questions.length} questions.`;
+      resultElement.appendChild(resultMessage);
+    }
+
+    displayQuestion();
+
+    nextButton.addEventListener('click', proceedNext);
+
+    // Enable the "Proceed Next" button when an option is selected
+    optionsElement.addEventListener('click', () => {
+      nextButton.disabled = false;
+    });
+  </script>
+</body>
+</html>
